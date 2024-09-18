@@ -1,0 +1,11 @@
+const express = require("express");
+const pacController = require("../controllers/pacController");
+const pacRouter = express.Router();
+pacRouter.route("/addnew").post(pacController.addnew  );
+pacRouter.route("/findcode").post(pacController.findCode  );
+pacRouter.route("/findname").post(pacController.findName  );
+pacRouter.route("/update").post(pacController.update  );
+pacRouter.route("/remove").post(pacController.remove  );
+pacRouter.route("/next").post(pacController.next  );
+pacRouter.route("/previous").post(pacController.previous  );
+module.exports = pacRouter;
