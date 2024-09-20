@@ -3,7 +3,7 @@ const doctor = require("../db/doctor")
 const addnew =  (req, res) =>
     {
 
-        console.log("Nuevo organo..." + req.body.nombre + " - " + req.body.edad);
+        console.log("Nuevo doctor..." + req.body.nombre + " - " + req.body.edad);
         organos.findOne({} ).sort({ code : -1}).then((resultado) => 
              { if (resultado==null) 
                  { 
