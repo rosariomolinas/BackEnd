@@ -1,10 +1,6 @@
 const mongoose = require('mongoose');
 
-//require('dotenv').config();
-
-const url = 'mongodb+srv://lcmolinas:LCMong.14@cluster0.5cxeq.mongodb.net/Ejemplo'
-///?retryWrites=true&w=majority&appName=Cluster0'
-// process.env.MONGODB_URI;
+const url = 'mongodb+srv://' + process.env.db_user + ':' +  process.env.db_password + '@' + process.env.mongo_url
 const connectDB = async () => {
     try {
         await mongoose.connect(url, {
