@@ -4,7 +4,8 @@ const docSchema = new mongoose.Schema( {
     code   : Number,
     nombre :  String,
     apellido :  String,
-    matricula : Number
+    matricula : Number,
+    activo : Boolean
 })
 
 const docs = new mongoose.model ('doctores', docSchema)
