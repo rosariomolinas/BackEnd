@@ -30,38 +30,35 @@ const addnew =  (req, res) =>
 
  
 
-    const update =  (req, res) =>
-    
-        {
-    
-            let mensaje = '';
-            console.log("Modificar paciente..." + req.body);
+const update =  (req, res) =>
 
-          
-            const filter = { code : req.body.code, activo : true };
-            const updatev = req.body;
-            pacientes.updateOne (filter, updatev ).then((result) => 
+    {
+
+        let mensaje = '';
+        console.log("Modificar paciente..." + req.body);
+
+        
+        const filter = { code : req.body.code, activo : true };
+        const updatev = req.body;
+        pacientes.updateOne (filter, updatev ).then((result) => 
+            {
+                console.log("resultado modificación ", result);
+                if (result.modifiedCount)
                 {
-                    console.log("resultado modificación ", result);
-                    if (result.modifiedCount)
-                    {
-                        res.status(200).json(result)
-                        mensaje = "Paciente actualizado";
-                    }
-                    else
-                    {
-                        res.status(200).json(result)
-                        mensaje = "Paciente no actualizado";
+                    res.status(200).json({"data" : result, "message" : "Paciente actualizado" })
+                    mensaje = "Paciente actualizado";
+                }
+                else
+                {
+                    res.status(200).json(result)
+                    mensaje = "Paciente no actualizado";
 
-                    }
-                    
-                  
-                })
-            
+                }
+                
+                
+            })
+    }
 
-            
-            
-        }
         const remove =  (req, res) =>
     
             {
@@ -76,7 +73,7 @@ const addnew =  (req, res) =>
                     {
     
                         mensaje = "Paciente desactivado";
-                        res.status(200).json({ status: mensaje })
+                        res.status(200).json(result)
                     })
                 
     
