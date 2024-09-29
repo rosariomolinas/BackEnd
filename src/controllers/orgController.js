@@ -78,6 +78,29 @@ const findCode =  (req, res) =>
                 
                 
             }   
+
+            const traertodos =  (req, res) =>
+                {
+                
+                    console.log("todos los organos..." );
+                    organos.find({}).then((resultado) => 
+                            {  
+                              let valores = '{';
+                              valores = valores + '"tejido_costo" : ' + process.env.tejido_costo + ', '
+                              valores = valores + '"sangre_costo" : ' + process.env.sangre_costo + ', '
+                              
+                              valores = valores + '"tomo3d_costo" : ' + process.env.tomo3d_costo + ', '
+                              valores = valores + '"tejido_tiempo" : ' + process.env.tejido_tiempo + ', '
+                              
+                              valores = valores + '"sangre_tiempo" :' + process.env.sangre_tiempo + ', '
+                              valores = valores + '"tomo3d_tiempo" : ' + process.env.tomo3d_tiempo + '} '
+
+                                res.status(200).json({"lista" : resultado, "valores" : JSON.parse(valores)})
+                
+                            });
+                    
+                   
+                }
     /*
 const findName =  (req, res) =>
     {
@@ -149,7 +172,7 @@ const findName =  (req, res) =>
        
 */
 module.exports = {
-    addnew, findCode, update // update // traertodos  traertodos 
+    addnew, findCode, update, traertodos // update // traertodos  traertodos 
    // update1, update2, 
      //remove, next, previous
     }
