@@ -14,7 +14,7 @@ app.use(session({
 
 
 
-const allRoutes = require("./src/routes/index.js")
+ const allRoutes = require("./src/routes/index.js")
 
 const dbMongo = require("./src/db/dbconnect")
 class DBServer {
@@ -33,12 +33,14 @@ const dbServ = new DBServer()
 
 dbServ.connectDB;
 
+
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
 
 app.use('/robiotics', allRoutes);
+
 
 app.use('/public', express.static(path.join(__dirname, 'public')))
 
@@ -48,6 +50,7 @@ var server = app.listen(process.env.PORT || process.env.port, function () {
     console.log("App now running on port", port);
  });
 
+ 
  app.get('/', function(req, res) {
     console.log("usuario loggeado ", req.session.sessuser );
     
@@ -68,8 +71,8 @@ var server = app.listen(process.env.PORT || process.env.port, function () {
     console.log("usuario loggeado pacientes", req.session.sessuser );
    res.sendFile(path.join(__dirname, '/src/views/pacientes.html'));
  });
- app.get('/medicos', function(req, res) {
-   res.sendFile(path.join(__dirname, '/src/views/medicos.html'));
+ app.get('/doctores', function(req, res) {
+   res.sendFile(path.join(__dirname, '/src/views/doctores.html'));
  });
  app.get('/organos', function(req, res) {
    res.sendFile(path.join(__dirname, '/src/views/organos.html'));
@@ -83,16 +86,21 @@ var server = app.listen(process.env.PORT || process.env.port, function () {
  });
  app.get('/menu', function(req, res) {
   console.log("menu=>", req.session.sessprofile)
-  
-  if (  !  req.session.sessprofile.localeCompare('admin')  )
-    { 
-        res.sendFile(path.join(__dirname, '/src/views/menu-admin.html'));
-    } 
-    if (! req.session.sessprofile.localeCompare('user') )
+  if (req.session.sessprofile != null)
+  {
+    if (  !  req.session.sessprofile.localeCompare('admin')  )
       { 
-          res.sendFile(path.join(__dirname, '/src/views/menu-user.html'));
+        console.log("ADMIN");
+          res.sendFile(path.join(__dirname, '/src/views/menu-admin.html'));
       } 
-  
+      if (! req.session.sessprofile.localeCompare('user') )
+        {  
+          console.log("USER");
+            res.sendFile(path.join(__dirname, '/src/views/menu-user.html'));
+        } 
+    } 
 });
+
+
 
 
