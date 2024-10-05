@@ -4,6 +4,7 @@ const pacRouter = express.Router();
 pacRouter.route("/addnew").post(pacController.addnew  );
 pacRouter.route("/findcode").post(pacController.findCode  );
 pacRouter.route("/findname").post(pacController.findName  );
+pacRouter.route("/findall").post(pacController.findAll  );
 pacRouter.route("/update").post(pacController.update  );
 pacRouter.route("/remove").post(pacController.remove  );
 pacRouter.route("/next").post(pacController.next  );

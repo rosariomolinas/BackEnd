@@ -1,24 +1,18 @@
 const organos = require("../db/organos")
 
-
-
 const traertodos =  (req, res) =>
     {
-        ctoytpo = {"tejido_costo" : Number(process.env.tejido_costo), 
-            "sangre_costo" : Number(process.env.sangre_costo),
-            "tomo3d_costo" : Number(process.env.tomo3d_costo),
-            "tejido_tiempo" : Number(process.env.tejido_tiempo),
-            "sangre_tiempo" : Number(process.env.sangre_tiempo),
-            "tomo3d_tiempo" : Number(process.env.tomo3d_tiempo) }
+    
         console.log("todos los órganos..." );
         organos.find({}).then((resultado) => 
                 {  
-                    res.status(200).json({"lista" : resultado, "valores" : ctoytpo })
+                    res.status(200).json({"lista" : resultado, "valores" : {} })
     
                 });
         
        
     }
+    
 const addnew =  (req, res) =>
     {
 
@@ -167,7 +161,8 @@ const findName =  (req, res) =>
        
 */
 module.exports = {
-    addnew, findCode, update, traertodos // update // traertodos  traertodos 
+    addnew, findCode, update, traertodos // update //   traertodos 
    // update1, update2, 
      //remove, next, previous
     }
+    

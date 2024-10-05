@@ -1,6 +1,3 @@
-var ctlista_pac = [];
-
-
 const pacientes = require("../db/pacientes")
 
 const addnew =  (req, res) =>
@@ -59,27 +56,25 @@ const update =  (req, res) =>
             })
     }
 
-        const remove =  (req, res) =>
+const remove =  (req, res) =>
+{
+
+    let mensaje = '';
+    console.log("Eliminar (desactivar) paciente..." + req.body.nombre + " - " + req.body.edad);
+
+    console.log("Paciente deactivado" , req.body.code);
+    const filter = { code : req.body.code };
+    const updatev = {activo :  false};
+    pacientes.updateOne (filter, updatev ).then((result) => 
+        {
+
+            res.status(200).json({"data" : {}, "message" : "Paciente eliminado" })
+        })
     
-            {
-        
-                let mensaje = '';
-                console.log("Eliminar (desactivar) paciente..." + req.body.nombre + " - " + req.body.edad);
+
     
-                console.log("Paciente deactivado" , req.body.code);
-                const filter = { code : req.body.code };
-                const updatev = {activo :  false};
-                pacientes.updateOne (filter, updatev ).then((result) => 
-                    {
     
-                        mensaje = "Paciente desactivado";
-                        res.status(200).json(result)
-                    })
-                
-    
-                
-                
-            }
+}
 const findCode =  (req, res) =>
         {
     
@@ -87,19 +82,27 @@ const findCode =  (req, res) =>
                         
             let  record = { ...req.body }
             console.log('req.body', record)
+            if ( record.activo)
+            {
+              cadactivo = {"code" : record.code, "activo" : true}
+            }
+            else {
+                cadactivo = {"code" : record.code}
+            }
+            
 
 //            console.log("1",req.body.code);
             console.log("fin buscar paciente...");
-            pacientes.findOne({"code" : record.code} ).then((resultado) => 
+            pacientes.findOne(cadactivo ).then((resultado) => 
                 { if (resultado==null) 
                     { 
                        // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
-                       res.status(200).json({ status: "not found" })
+                       res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
                     } 
                     else 
                     { 
                         console.log(resultado.nombre);
-                        res.status(200).json(resultado)
+                        res.status(200).json({"data" : [resultado], "message" : ""})
                     } 
                 });
                 
@@ -108,75 +111,120 @@ const findCode =  (req, res) =>
     
 
 const findName =  (req, res) =>
-    {
+{
 
-        console.log("Find by name...");
-        pacientes.findOne({"nombre" : req.body.nombre} ).then((resultado) => 
-            { if (resultado==null) 
+    console.log("Find by name...");
+    let  record = { ...req.body }
+    if ( record.activo)
+    {
+      cadactivo = { "nombre": { $regex: '.*' + req.body.nombre + '.*' }, "activo" : true }
+    }
+    else {
+        cadactivo = { "nombre": { $regex: '.*' + req.body.nombre + '.*' } }
+    }
+    
+    pacientes.find(cadactivo ).then((resultado) => 
+        { 
+            if (resultado.length == 0) 
+            { 
+                // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
+                
+                console.log("Not found");
+                res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
+            } 
+            else 
+            { 
+                console.log(resultado);
+                res.status(200).json({"data" : resultado, "message" : ""})
+            } 
+        });
+        
+        
+} 
+    
+const findAll =  (req, res) =>
+    {
+    
+        console.log("Find all...");
+        let  record = { ...req.body }
+        if ( record.activo)
+        {
+          cadactivo = {"activo" : true }
+        }
+        else {
+            cadactivo = {}
+        }
+        
+        // console.log(jstring);
+        pacientes.find(cadactivo  ).then((resultado) => 
+            { 
+                if (resultado.length == 0) 
                 { 
                     // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
-                    res.status(200).json({ status: "not found" })
+                    
+                    console.log("Not found");
+                    res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
                 } 
                 else 
                 { 
-                    console.log(resultado.nombre);
-                    res.status(200).json(resultado)
+                    console.log(resultado);
+                    res.status(200).json({"data" : resultado, "message" : ""})
                 } 
             });
             
             
     } 
+
+const next =  (req, res) =>
+    {
+
+        console.log("Siguiente paciente...");
+                    
+        console.log("actual=>",req.body.code);
         
-    const next =  (req, res) =>
-        {
-    
-            console.log("Siguiente paciente...");
-                        
-            console.log("actual=>",req.body.code);
+        pacientes.find({code: {$gt: req.body.code}, activo : true}).sort({code: 1 }).limit(1).then((resultado) => 
+            {  console.log(resultado, "--", resultado.length);
+                 if (resultado.length) 
+                { 
+                    console.log();
+                    res.status(200).json({"data" : resultado, "message" : "" })                   
+                } 
+                else 
+                { 
+                     // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
+                     res.status(200).json({"data" : resultado, "message" : "Paciente no encontrado" })   
+                } 
+            });
             
-            pacientes.find({code: {$gt: req.body.code}}).sort({code: 1 }).limit(1).then((resultado) => 
-                { if (resultado==null) 
-                    { 
-                         console.log("null");
-                       // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
-                       res.status(200).json({ status: "not found" })
-                    } 
-                    else 
-                    { 
-                        console.log("found ", resultado);
-                        res.status(200).json(resultado)
-                    } 
-                });
-                
-                
-        } 
+            
+    } 
   
-        const previous =  (req, res) =>
-            {
+const previous =  (req, res) =>
+    {
+
+        console.log("Anterior paciente...");
+                    
+        //            console.log("1",req.body.code);
         
-                console.log("Anterior paciente...");
-                            
-               //            console.log("1",req.body.code);
-                
-                pacientes.find({code: {$lt: req.body.code}}).sort({code: -1 }).limit(1).then((resultado) => 
-                    { if (resultado==null) 
-                        { 
-                           // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
-                           res.status(200).json({ status: "not found" })
-                        } 
-                        else 
-                        { 
-                            console.log(resultado);
-                            res.status(200).json(resultado)
-                        } 
-                    });
-                    
-                    
-            } 
+        pacientes.find({code: {$lt: req.body.code} , activo : true}).sort({code: -1 }).limit(1).then((resultado) => 
+            {  if (resultado.length) 
+                { 
+                    console.log();
+                    res.status(200).json({"data" : resultado, "message" : "" })                   
+                } 
+                else 
+                { 
+                     // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
+                     res.status(200).json({"data" : resultado, "message" : "Paciente no encontrado" })   
+                } 
+            });
+            
+            
+    } 
       
        
 
 module.exports = {
-    addnew, findCode, findName, update, remove, next, previous
+    addnew, findCode, findName, findAll, update, remove, next, previous
     }
     

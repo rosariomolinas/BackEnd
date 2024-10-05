@@ -34,28 +34,59 @@ const findCode =  (req, res) =>
                 { if (resultado==null) 
                     { 
                        // not found doctor.create({code: 1, nombre :  req.body.nombre , nromatricula:  req.body.nromatricula} )
-                       res.status(200).json({ status: "not found" })
+                       res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
                     } 
                     else 
                     { 
                         console.log(resultado.nombre);
-                        res.status(200).json(resultado)
+                        res.status(200).json({"data" : [resultado], "message" : ""})
                     } 
                 });
                 
                 
         } 
+const findName =  (req, res) =>
+    {
     
+        console.log("Find by name...");
+        let  record = { ...req.body }
+        if ( record.activo)
+        {
+            cadactivo = { "nombre": { $regex: '.*' + req.body.nombre + '.*' }, "activo" : true }
+        }
+        else {
+            cadactivo = { "nombre": { $regex: '.*' + req.body.nombre + '.*' } }
+        }
+        
+        doctor.find(cadactivo ).then((resultado) => 
+            { 
+                if (resultado.length == 0) 
+                { 
+                    // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
+                    
+                    console.log("Not found");
+                    res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
+                } 
+                else 
+                { 
+                    console.log(resultado);
+                    res.status(200).json({"data" : resultado, "message" : ""})
+                } 
+            });
             
-            const findName =  (req, res) =>
+            
+    } 
+            
+            
+            const findNameold =  (req, res) =>
                 {
             
                     console.log("Find by name...");
-                    doctores.findOne({"nombre" : req.body.nombre} ).then((resultado) => 
+                    doctor.findOne({"nombre" : req.body.nombre} ).then((resultado) => 
                         { if (resultado==null) 
                             { 
-                              // not found doctores.create({code: 1, nombre :  req.body.nombre , matricula:  req.body.matricula} )
-                                res.status(200).json({ status: "not found" })
+                            
+                              res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
                             } 
                             else 
                             { 
@@ -170,5 +201,3 @@ const findCode =  (req, res) =>
                 module.exports = {
                     addnew, findCode, findName, update, next, previous, remove  
                 }
-
-        
