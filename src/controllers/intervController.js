@@ -1,0 +1,57 @@
+const intervenciones = require("../db/intervenciones")
+
+
+
+const traertodos =  (req, res) =>
+    {
+        ctoytpo = {"tejido_costo" : Number(process.env.tejido_costo), 
+            "sangre_costo" : Number(process.env.sangre_costo),
+            "tomo3d_costo" : Number(process.env.tomo3d_costo),
+            "tejido_tiempo" : Number(process.env.tejido_tiempo),
+            "sangre_tiempo" : Number(process.env.sangre_tiempo),
+            "tomo3d_tiempo" : Number(process.env.tomo3d_tiempo) }
+        console.log("todos los órganos..." );
+        intervenciones.find({}).then((resultado) => 
+                {  
+                    res.status(200).json({"lista" : resultado, "valores" : ctoytpo })
+    
+                });
+        
+       
+    }
+const addnew =  (req, res) =>
+    {
+
+        console.log("Nueva intervención...", req.body  );
+        intervenciones.create(req.body )
+
+        res.status(200).json({ "data" : {},  "message": "Datos de la intervención guardados" })
+    }
+const findCode =  (req, res) =>
+        {
+            console.log("Buscar organo...");
+                        
+            let  record = { ...req.body }
+            console.log('req.body', record)
+
+//            console.log("1",req.body.code);
+            console.log("fin buscar organo...");
+            intervenciones.findOne({"code" : record.code} ).then((resultado) => 
+                { if (resultado==null) 
+                    { 
+                       // not found pacientes.create({code: 1, nombre :  req.body.nombre , orden:  req.body.orden} )
+                       res.status(200).json({ status: "not found" })
+                    } 
+                    else 
+                    { 
+                        console.log(resultado.nombre);
+                        res.status(200).json(resultado)
+                    } 
+                });
+                
+                
+                
+        } 
+module.exports = {
+    addnew, findCode, traertodos
+    }
