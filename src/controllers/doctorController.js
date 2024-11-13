@@ -76,27 +76,41 @@ const findName =  (req, res) =>
             
             
     } 
+
+    const findAll =  (req, res) =>
+        {
+        
+            console.log("Find all...");
+            let  record = { ...req.body }
+            if ( record.activo)
+            {
+              cadactivo = {"activo" : true }
+            }
+            else {
+                cadactivo = {}
+            }
             
-            
-            const findNameold =  (req, res) =>
-                {
-            
-                    console.log("Find by name...");
-                    doctor.findOne({"nombre" : req.body.nombre} ).then((resultado) => 
-                        { if (resultado==null) 
-                            { 
-                            
-                              res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
-                            } 
-                            else 
-                            { 
-                                console.log(resultado.nombre);
-                                res.status(200).json(resultado)
-                            } 
-                        });
+            // console.log(jstring);
+            doctor.find(cadactivo  ).then((resultado) => 
+                { 
+                    if (resultado.length == 0) 
+                    { 
+                        // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
                         
-                        
-                }   
+                        console.log("Not found");
+                        res.status(200).json({ "data" : [],  "message": "No hay coincidencias" })
+                    } 
+                    else 
+                    { 
+                        console.log(resultado);
+                        res.status(200).json({"data" : resultado, "message" : ""})
+                    } 
+                });
+                
+                
+        } 
+                
+            
                 const update =  (req, res) =>
 
                     {
@@ -199,5 +213,5 @@ const findName =  (req, res) =>
                                     }
 
                 module.exports = {
-                    addnew, findCode, findName, update, next, previous, remove  
+                    addnew, findCode, findName, findAll, update, next, previous, remove  
                 }

@@ -1,4 +1,5 @@
 const pacientes = require("../db/pacientes")
+const usuCtrl = require("./usuController")
 
 const addnew =  (req, res) =>
     {
@@ -9,7 +10,8 @@ const addnew =  (req, res) =>
              { if (resultado==null) 
                  { 
                     pacientes.create({code: 1, nombre :  req.body.nombre , apellido :  req.body.apellido , edad:  req.body.edad, activo: true} ).then((result) => {
-                        res.status(200).json(result)
+                     
+                        res.status(200).json({"data" : [result], "message" : "Paciente nuevo" })
                     })
 
                  } 
@@ -17,7 +19,8 @@ const addnew =  (req, res) =>
                  { 
                     let newcod = resultado.code + 1;
                     pacientes.create({code: newcod, nombre :  record.nombre , apellido :  record.apellido , edad:  record.edad, activo: true} ).then((result) => {
-                        res.status(200).json(result)
+                        
+                        res.status(200).json({"data" : [result], "message" : "Paciente nuevo" })
                     })
                  } 
     
@@ -42,7 +45,7 @@ const update =  (req, res) =>
                 console.log("resultado modificación ", result);
                 if (result.modifiedCount)
                 {
-                    res.status(200).json({"data" : result, "message" : "Paciente actualizado" })
+                    res.status(200).json({"data" : [result], "message" : "Paciente actualizado" })
                     mensaje = "Paciente actualizado";
                 }
                 else
@@ -68,7 +71,7 @@ const remove =  (req, res) =>
     pacientes.updateOne (filter, updatev ).then((result) => 
         {
 
-            res.status(200).json({"data" : {}, "message" : "Paciente eliminado" })
+            res.status(200).json({"data" : [result], "message" : "Paciente eliminado" })
         })
     
 
@@ -79,33 +82,49 @@ const findCode =  (req, res) =>
         {
     
             console.log("Buscar paciente...");
-                        
             let  record = { ...req.body }
             console.log('req.body', record)
-            if ( record.activo)
-            {
-              cadactivo = {"code" : record.code, "activo" : true}
-            }
-            else {
-                cadactivo = {"code" : record.code}
-            }
+            console.log("Validar TOKEN", record.token);
             
+            usuCtrl.validarToken (record.token).then( (rrr) => {
+                if (rrr)
+                    {    
+                                  
+                      console.log("token validado");
+                      if ( record.activo)
+                      {
+                      cadactivo = {"code" : record.code, "activo" : true}
+                      }
+                      else {
+                          cadactivo = {"code" : record.code}
+                      }
+                      
+          
+          //            console.log("1",req.body.code);
+                      console.log("fin buscar paciente...");
+                      pacientes.findOne(cadactivo ).then((resultado) => 
+                          { if (resultado==null) 
+                              { 
+                              // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
+                              res.status(200).json({ "data" : [],  "message": "No hay coincidencias" })
+                              } 
+                              else 
+                              { 
+                                  console.log(resultado.nombre);
+                                  res.status(200).json({"data" : [resultado], "message" : ""})
+                              } 
+                          });
+                          
+                      } /// validar token
+                      else
+                      {
+                          res.status(200).json({ "data" : [],  "message": "Token no válidado" })
+                      }
 
-//            console.log("1",req.body.code);
-            console.log("fin buscar paciente...");
-            pacientes.findOne(cadactivo ).then((resultado) => 
-                { if (resultado==null) 
-                    { 
-                       // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
-                       res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
-                    } 
-                    else 
-                    { 
-                        console.log(resultado.nombre);
-                        res.status(200).json({"data" : [resultado], "message" : ""})
-                    } 
-                });
+            })
                 
+                    
+        
                 
         } 
     
@@ -130,7 +149,7 @@ const findName =  (req, res) =>
                 // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
                 
                 console.log("Not found");
-                res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
+                res.status(200).json({ "data" : [],  "message": "No hay coincidencias" })
             } 
             else 
             { 
@@ -163,7 +182,7 @@ const findAll =  (req, res) =>
                     // not found pacientes.create({code: 1, nombre :  req.body.nombre , edad:  req.body.edad} )
                     
                     console.log("Not found");
-                    res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
+                    res.status(200).json({ "data" : [],  "message": "No hay coincidencias" })
                 } 
                 else 
                 { 

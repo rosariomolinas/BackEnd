@@ -1,34 +1,151 @@
 
 
 const usuarios = require("../db/usuarios")
+const crypto = require('node:crypto');
+const userLogged = (req, res) =>
+{
+    console.log('userLooged??')
+    if (req.session.sessuser )
+    {
+        res.status(200).json({ "logged" : true, "profile" : req.session.sessprofile })
+        console.log('resp=> true')
+        }
+    else {
 
+        res.status(200).json({ "logged" : "n" })
+        console.log('resp=> false')
+    }
+
+
+}
+
+async function validarToken (token)
+    {
+        var responde = false;
+        console.log("Validar__token in ...", token);
+        
+                     
+        const resultado = await usuarios.findOne({"token" : token } )
+              
+        if (resultado==null) 
+        { 
+            responde = false;
+            
+        } 
+        else 
+        { 
+            
+            responde = true;
+        } 
+
+        console.log("RESULTADO token:",  resultado );
+
+        return(responde)
+    }
+const validToken =  (req, res) =>
+    {
+        console.log("Validar token...");
+        
+        let  record = { ...req.body }
+                    
+        usuarios.findOneAndUpdate({"token" : record.token } ).then((resultado) => 
+            { 
+                
+              if (resultado==null) 
+                { 
+                   res.status(200).json({ "data" : false, "message": "Token no es válido" })
+                   
+                } 
+                else 
+                { 
+                    console.log("RESULTADO token:",  resultado );
+
+                    res.status(200).json({ "data" : true, "user" : resultado.user , "profile": resultado.profile })
+                                            
+
+                } 
+
+            }
+        )  ;
+    }
 
 const validar =  (req, res) =>
         {
-    
+           
             console.log("Validar usuario...");
-                        
+            console.log("usuario sesión antes:",  req.session.sessuser );
+            
             let  record = { ...req.body }
             console.log('req.body', record)
-
-            usuarios.findOne({"user" : record.user, "password" : record.password} ).then((resultado) => 
-                { if (resultado==null) 
+            var id = crypto.randomBytes(20).toString('hex');
+            const updatev = { "token" : id } ;
+            
+            usuarios.findOneAndUpdate({"user" : record.user, "password" : record.password}, updatev ).then((resultado) => 
+                { 
+                    
+                  if (resultado==null) 
                     { 
                        res.status(200).json({ "data" : false, "message": "Usuario o Clave incorrectos" })
+                       
                     } 
                     else 
                     { 
+                        console.log("RESULTADO:",  resultado );
                         console.log("usuario sesión:",  req.session.sessuser );
                         console.log("usuario resultado:",  resultado.user);
-                        req.session.sessuser = resultado.user;
-                        req.session.sessprofile = resultado.profile;
-                        console.log("perfil",  resultado.profile);
-                        res.status(200).json({ "data" : true, "message": "Usuario válido" })
+
+                        res.status(200).json({ "data" : true, "token" : id , "message": "Usuario válido" })
+                                                
+ 
                     } 
-                });
+ 
+                }
+            )  ;
+             
+            
                 
                 
         } 
+
+const validar2 =  (req, res) =>
+    {
+
+        console.log("Validar usuario...");
+        console.log("usuario sesión antes:",  req.session.sessuser );
+        
+        let  record = { ...req.body }
+        console.log('req.body', record)
+        var id = crypto.randomBytes(20).toString('hex');
+        usuarios.findOne({"user" : record.user, "password" : record.password} ).then((resultado) => 
+            { 
+                
+                if (resultado==null) 
+                { 
+                    res.status(200).json({ "data" : false, "message": "Usuario o Clave incorrectos" })
+                } 
+                else 
+                { 
+                    console.log("RESULTADO:",  resultado );
+                    console.log("usuario sesión:",  req.session.sessuser );
+                    console.log("usuario resultado:",  resultado.user);
+
+                    
+                        console.log("usuario token:",  id);
+                        req.session.sessuser = resultado.user;
+                        req.session.sessprofile = resultado.profile;
+                        console.log("perfil",  resultado.profile);
+                        console.log("usuario sesión después:",  req.session.sessuser );
+                        res.status(200).json({ "data" : true, "token" : id , "message": "Usuario válido" })
+
+                                            
+
+                } 
+            });
+            
+            
+    } 
+    
+
 const pwdUpdate =  (req, res) =>
     {
 
@@ -48,7 +165,7 @@ const pwdUpdate =  (req, res) =>
                     const updatev = { "password" : record.passwordnew } ;
                     usuarios.updateOne (filter, updatev ).then((result) => 
                    {
-                       console.log("usuario sesión:",  req.session.sessuser );                 
+                       console.log("usuario sesión:",  req.session.sessuser, "result=>", result );                 
                        res.status(200).json({ "data" : true, "message": "Contraseña actualizada" })
                    });
                 } 
@@ -88,6 +205,6 @@ const datos =  (req, res) =>
 
 
 module.exports = {
-    validar, pwdUpdate, logout, datos
+    validar, pwdUpdate, logout, datos, userLogged, validToken, validarToken
     }
     
