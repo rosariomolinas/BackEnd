@@ -5,6 +5,7 @@ docRouter.route("/addnew").post(docController.addnew  );
 
 docRouter.route("/findcode").post(docController.findCode  );
 docRouter.route("/findname").post(docController.findName  );
+docRouter.route("/findall").post(docController.findAll  );
 docRouter.route("/update").post(docController.update  );
 docRouter.route("/next").post(docController.next  );
 docRouter.route("/previous").post(docController.previous  );
