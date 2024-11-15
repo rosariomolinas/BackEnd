@@ -34,7 +34,7 @@ const findCode =  (req, res) =>
                 { if (resultado==null) 
                     { 
                        // not found doctor.create({code: 1, nombre :  req.body.nombre , nromatricula:  req.body.nromatricula} )
-                       res.status(200).json({ "data" : {},  "message": "No hay coincidencias" })
+                       res.status(200).json({ "data" : [],  "message": "No hay coincidencias" })
                     } 
                     else 
                     { 

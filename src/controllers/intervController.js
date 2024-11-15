@@ -19,6 +19,33 @@ const traertodos =  (req, res) =>
         
        
     }
+
+
+const traeralgunos =  (req, res) =>
+    {
+        
+        console.log("todos algunos órganos (filtros)..." );
+        let  record = { ...req.body }
+        var jquery = {};
+        console.log('req.body', record);
+        if (!(record.doctor == null ))
+        {    
+           jquery.doctor = record.doctor;
+        }
+        if (!(record.paciente == null ))
+            {    
+               jquery.paciente = record.paciente;
+            }
+            console.log('query', jquery);
+        intervenciones.find(jquery).then((resultado) => 
+                {  
+
+                    console.log(resultado);
+                    res.status(200).json({"lista" : resultado })
+                });
+        
+        
+    }
 const addnew =  (req, res) =>
     {
 
@@ -53,5 +80,5 @@ const findCode =  (req, res) =>
                 
         } 
 module.exports = {
-    addnew, findCode, traertodos
+    addnew, findCode, traertodos, traeralgunos
     }
