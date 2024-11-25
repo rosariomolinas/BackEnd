@@ -39,9 +39,15 @@ const traeralgunos =  (req, res) =>
             console.log('query', jquery);
         intervenciones.find(jquery).then((resultado) => 
                 {  
-
+                   if (resultado.length)
+                   {
                     console.log(resultado);
-                    res.status(200).json({"lista" : resultado })
+                    res.status(200).json({"data" : resultado })
+                   }
+                   else {
+                    console.log(resultado);
+                    res.status(200).json({"data" : resultado, "message": "Datos de la intervención guardados" })
+                   }
                 });
         
         
