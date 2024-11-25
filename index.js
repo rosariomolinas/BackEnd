@@ -1,8 +1,11 @@
 var express = require("express");
+const cors = require('cors');
+cors. SupportsCredentials = true;
 var session = require('express-session');
 var bodyParser = require("body-parser");
 var path = require('path');
 var app = express(); 
+app.use(cors());
 
 require('dotenv').config();
 
