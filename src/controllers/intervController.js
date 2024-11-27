@@ -33,9 +33,33 @@ const traeralgunos =  (req, res) =>
            jquery.doctor = record.doctor;
         }
         if (!(record.paciente == null ))
+        {    
+            jquery.paciente = record.paciente;
+        }
+
+
+        if (!(record.fecdes == null ))
             {    
-               jquery.paciente = record.paciente;
+                if (!(record.fechas == null ))
+                    { 
+                        jquery.fecint = {$gte: record.fecdes, $lt: record.fechas};
+                    }
+                    else 
+                    {
+                        jquery.fecint = {$gte: record.fecdes};
+                    }
+
+
+                
             }
+        else 
+        {
+            if (!(record.fechas == null ))
+                { 
+                    jquery.fecint = {$lt: record.fechas};
+                }    
+        }
+
             console.log('query', jquery);
         intervenciones.find(jquery).then((resultado) => 
                 {  
