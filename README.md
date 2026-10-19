@@ -7,7 +7,7 @@ API de Robiotics, un sistema para gestionar intervenciones quirúrgicas robótic
 
 ## Tecnologías
 
-Node.js (18 o superior), Express, MongoDB Atlas y Mongoose.
+Node.js (18 o superior), TypeScript, Express, MongoDB Atlas y Mongoose.
 
 ## Instalación
 
@@ -24,8 +24,10 @@ Completá el `.env` con los datos de tu cluster de MongoDB Atlas (`mongo_url`, `
 
 | Comando | Qué hace |
 |:-|:-|
-| `npm run dev` | Levanta la API con recarga automática (nodemon) |
-| `npm start` | Levanta la API en modo producción |
+| `npm run dev` | Levanta la API con recarga automática (tsx) |
+| `npm run build` | Compila TypeScript a `dist/` |
+| `npm start` | Levanta la versión compilada (correr antes `npm run build`) |
+| `npm run typecheck` | Verifica los tipos sin compilar |
 | `npm test` | Corre los tests |
 
 La API queda en `http://localhost:8080/robiotics` (o el `PORT` del `.env`). `GET /health` responde `{"status":"ok"}` para verificar que está arriba.
@@ -42,15 +44,20 @@ Los perfiles válidos son `admin` y `user`.
 
 ## Estructura
 
+El código está organizado por entidad: cada carpeta tiene su modelo, sus validaciones y sus rutas.
+
 ```
-index.js              arranque: carga .env, conecta la base y levanta el servidor
-src/app.js            configuración de Express (CORS, JSON, rutas, errores)
-src/routes/           definición de endpoints
-src/middlewares/      validación, autenticación y manejo de errores
-src/validators/       reglas de validación de cada entidad
-src/controllers/      traducen la petición HTTP a llamadas al servicio
-src/services/         lógica de negocio y acceso a datos
-src/db/               conexión y modelos de Mongoose
+src/server.ts            arranque: carga .env, conecta la base y levanta el servidor
+src/app.ts               configuración de Express (CORS, JSON, rutas, errores)
+src/routes.ts            monta las rutas de cada entidad bajo /robiotics
+src/paciente/            paciente.model.ts, paciente.validator.ts, paciente.routes.ts
+src/doctor/              ídem para doctores
+src/organo/              ídem para órganos (+ /traertodos con costos)
+src/medicamento/         modelo y listado de medicamentos
+src/intervencion/        modelo, validaciones, servicio, controller y rutas de intervenciones
+src/usuario/             login, cambio de contraseña y logout
+src/shared/              piezas comunes: errores, validación, auth, conexión a la base
+src/shared/crud/         servicio, controller y router genéricos que usan pacientes, doctores y órganos
 ```
 
 ## Errores
