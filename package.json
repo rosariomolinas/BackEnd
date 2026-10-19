@@ -1,27 +1,27 @@
 {
-  "name": "rochi",
+  "name": "robiotics-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "API REST de Robiotics (TP Desarrollo de Software, UTN FRRO)",
   "main": "index.js",
   "scripts": {
-    "tsc": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Todavía no hay tests (pendiente P1)\" && exit 0"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.2",
-    "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "mongoose": "^8.5.3",
-    "path": "^0.12.7"
+    "cors": "^2.8.5"
   },
   "devDependencies": {
-    "cors": "^2.8.5",
-    "nodemon": "^3.1.7",
-    "typescript": "^5.6.2"
+    "nodemon": "^3.1.7"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

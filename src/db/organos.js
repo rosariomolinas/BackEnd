@@ -1,15 +1,14 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const orgSchema = new mongoose.Schema( {
-    code   : Number,
-    nombre :  String,
-    mtejido : Boolean,
-    msangre : Boolean,
-    tomo3d : Boolean,
-    medica : Boolean,
-    orden : Number
-})
+const orgSchema = new mongoose.Schema({
+  code: { type: Number, required: true, unique: true },
+  nombre: { type: String, required: [true, 'El nombre es obligatorio'], trim: true },
+  mtejido: { type: Boolean, default: false },
+  msangre: { type: Boolean, default: false },
+  tomo3d: { type: Boolean, default: false },
+  medica: { type: Boolean, default: false },
+  orden: Number,
+  activo: { type: Boolean, default: true },
+});
 
-const orgs = new mongoose.model ('organos', orgSchema)
-
-module.exports = orgs
+module.exports = mongoose.model('organos', orgSchema);

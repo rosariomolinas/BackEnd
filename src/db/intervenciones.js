@@ -1,14 +1,13 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const intervenSchema = new mongoose.Schema( {
-    paciente : Number,
-    doctor   : Number,
-    fecint   : Date,
-    costo    : Number,
-    tiempo   : Number,
-    ruta     : {type : Array, "default": []}
-})
+// paciente, doctor y ruta[].organo guardan el "code" de cada entidad.
+const intervenSchema = new mongoose.Schema({
+  paciente: { type: Number, required: [true, 'El paciente es obligatorio'] },
+  doctor: { type: Number, required: [true, 'El doctor es obligatorio'] },
+  fecint: { type: Date, required: [true, 'La fecha es obligatoria'] },
+  costo: { type: Number, min: 0 },
+  tiempo: { type: Number, min: 0 },
+  ruta: { type: Array, default: [] },
+});
 
-const intervenciones = new mongoose.model ('intervenciones', intervenSchema)
-
-module.exports = intervenciones
+module.exports = mongoose.model('intervenciones', intervenSchema);
