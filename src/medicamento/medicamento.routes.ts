@@ -1,10 +1,18 @@
-import { Router } from 'express';
-import { asyncHandler } from '../shared/errors';
-import { Medicamento } from './medicamento.model';
+import { CrudService } from '../shared/crud/crud.service';
+import { crudController } from '../shared/crud/crud.controller';
+import { crudRouter } from '../shared/crud/crud.router';
+import { requireRole } from '../shared/auth';
+import { Medicamento, type IMedicamento } from './medicamento.model';
+import { validarMedicamento, validarMedicamentoUpdate } from './medicamento.validator';
 
-export const medicamentoRouter = Router();
+export const medicamentoService = new CrudService<IMedicamento>(Medicamento, {
+  label: 'Medicamento',
+  fields: ['nombre'],
+});
 
-// Devuelve el array de medicamentos (formato que consume el frontend).
-medicamentoRouter.post('/traertodos', asyncHandler(async (req, res) => {
-  res.json(await Medicamento.find({}).sort({ code: 1 }));
-}));
+// Cualquier usuario logueado consulta; el ABM de medicamentos es del administrador.
+export const medicamentoRouter = crudRouter(
+  crudController(medicamentoService),
+  { create: validarMedicamento, update: validarMedicamentoUpdate },
+  [requireRole('admin')],
+);

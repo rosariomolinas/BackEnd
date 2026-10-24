@@ -1,19 +1,42 @@
-import type { Request } from 'express';
-import { Usuario } from '../usuario/usuario.model';
-import { ApiError, asyncHandler } from './errors';
+import type { RequestHandler } from 'express';
+import jwt from 'jsonwebtoken';
+import { ApiError } from './errors';
+import type { Perfil } from '../usuario/usuario.model';
 
-// Toma el token del header "Authorization: Bearer <token>" o, por compatibilidad, del body.
-export const getToken = (req: Request): string | undefined => {
-  const header = req.headers.authorization || '';
-  if (header.startsWith('Bearer ')) return header.slice(7);
-  return req.body && req.body.token;
+// Datos del usuario que viajan dentro del JWT.
+export interface Sesion {
+  id: string;
+  user: string;
+  profile: Perfil;
+}
+
+const secreto = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && process.env.NODE_ENV === 'production') throw new Error('Falta JWT_SECRET en el .env');
+  return secret || 'secreto-solo-para-desarrollo';
 };
 
-export const requireToken = asyncHandler(async (req, res, next) => {
-  const token = getToken(req);
-  if (!token) throw new ApiError(401, 'Falta el token de sesión');
-  const usuario = await Usuario.findOne({ token });
-  if (!usuario) throw new ApiError(401, 'Token no válido');
-  res.locals.usuario = usuario;
-  next();
+export const firmarToken = (sesion: Sesion) => jwt.sign(sesion, secreto(), {
+  expiresIn: (process.env.JWT_EXPIRES_IN || '8h') as jwt.SignOptions['expiresIn'],
 });
+
+// Exige un JWT válido en "Authorization: Bearer <token>" y deja la sesión en res.locals.sesion.
+export const requireAuth: RequestHandler = (req, res, next) => {
+  const header = req.headers.authorization || '';
+  if (!header.startsWith('Bearer ')) return next(new ApiError(401, 'Iniciá sesión para continuar'));
+  try {
+    const { id, user, profile } = jwt.verify(header.slice(7), secreto()) as Sesion;
+    res.locals.sesion = { id, user, profile };
+    return next();
+  } catch (e) {
+    return next(new ApiError(401, 'La sesión expiró o no es válida. Volvé a iniciar sesión'));
+  }
+};
+
+// Exige que el usuario logueado tenga alguno de los perfiles indicados (va después de requireAuth).
+export const requireRole = (...perfiles: Perfil[]): RequestHandler => (req, res, next) => {
+  const sesion = res.locals.sesion as Sesion | undefined;
+  if (!sesion) return next(new ApiError(401, 'Iniciá sesión para continuar'));
+  if (!perfiles.includes(sesion.profile)) return next(new ApiError(403, 'Tu perfil no tiene permiso para esta operación'));
+  return next();
+};

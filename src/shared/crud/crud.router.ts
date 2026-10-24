@@ -1,31 +1,26 @@
 import { Router, type RequestHandler } from 'express';
 import { asyncHandler } from '../errors';
-import {
-  sinValidacion, validarCodigo, validarNombreBusqueda, validate, type Validator,
-} from '../validation';
+import { validarCodigo, validate, type Validator } from '../validation';
 import type { CrudController } from './crud.controller';
 
-type Ruta = 'addnew' | 'findcode' | 'findname' | 'findall' | 'update' | 'remove' | 'next' | 'previous';
-
-// Arma las rutas estándar de un CRUD (mismas URLs que usa el frontend).
-// extra: middlewares por ruta, por ejemplo { findcode: [requireToken] }.
+// Arma las rutas REST de un CRUD:
+//   GET / (?nombre, ?todos)   GET /:code   GET /:code/siguiente   GET /:code/anterior
+//   POST /   PUT /:code   DELETE /:code
+// escritura: middlewares que se aplican solo a POST, PUT y DELETE (por ejemplo requireRole('admin')).
 export const crudRouter = (
   controller: CrudController,
   validators: { create: Validator; update: Validator },
-  extra: Partial<Record<Ruta, RequestHandler[]>> = {},
+  escritura: RequestHandler[] = [],
 ) => {
   const router = Router();
-  const add = (path: Ruta, validator: Validator, handler: CrudController[keyof CrudController]) => {
-    router.post(`/${path}`, ...(extra[path] || []), validate(validator), asyncHandler(handler));
-  };
+  const code = validate(validarCodigo, 'params');
 
-  add('addnew', validators.create, controller.addnew);
-  add('findcode', validarCodigo, controller.findCode);
-  add('findname', validarNombreBusqueda, controller.findName);
-  add('findall', sinValidacion, controller.findAll);
-  add('update', validators.update, controller.update);
-  add('remove', validarCodigo, controller.remove);
-  add('next', validarCodigo, controller.next);
-  add('previous', validarCodigo, controller.previous);
+  router.get('/', asyncHandler(controller.list));
+  router.get('/:code', code, asyncHandler(controller.get));
+  router.get('/:code/siguiente', code, asyncHandler(controller.next));
+  router.get('/:code/anterior', code, asyncHandler(controller.previous));
+  router.post('/', ...escritura, validate(validators.create), asyncHandler(controller.create));
+  router.put('/:code', ...escritura, code, validate(validators.update), asyncHandler(controller.update));
+  router.delete('/:code', ...escritura, code, asyncHandler(controller.remove));
   return router;
 };

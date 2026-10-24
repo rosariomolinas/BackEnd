@@ -1,19 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import session from 'express-session';
 import { routes } from './routes';
 import { errorHandler, notFound } from './shared/errors';
 
 export const app = express();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:3000' }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret',
-  resave: false,
-  saveUninitialized: false,
-}));
 
 app.get('/health', (req, res) => { res.json({ status: 'ok' }); });
 app.use('/robiotics', routes);

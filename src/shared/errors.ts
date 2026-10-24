@@ -1,7 +1,7 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 // Manejo centralizado de errores de la API.
-// Todas las respuestas de error tienen la forma { data: [], message } y un código HTTP acorde.
+// Todas las respuestas de error tienen la forma { data: [], message, errors? } y un código HTTP acorde.
 
 export class ApiError extends Error {
   constructor(public status: number, message: string, public errors: string[] = []) {
@@ -31,6 +31,9 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
   if (err.name === 'ValidationError') {
     const errors = Object.values<{ message: string }>(err.errors).map((e) => e.message);
     return res.status(400).json({ data: [], message: 'Datos inválidos', errors });
+  }
+  if (err.code === 11000) {
+    return res.status(409).json({ data: [], message: 'Ya existe un registro con esos datos' });
   }
   if (err.name === 'CastError') {
     return res.status(400).json({ data: [], message: `Valor inválido para ${err.path}` });
