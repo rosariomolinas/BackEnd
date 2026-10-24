@@ -28,7 +28,7 @@ Completá el `.env` con los datos de tu cluster de MongoDB Atlas (`mongo_url`, `
 | `npm run build` | Compila TypeScript a `dist/` |
 | `npm start` | Levanta la versión compilada (correr antes `npm run build`) |
 | `npm run typecheck` | Verifica los tipos sin compilar |
-| `npm run seed` | Carga usuarios, órganos y medicamentos iniciales si esas colecciones están vacías |
+| `npm run seed` | Carga usuarios, un médico, órganos y medicamentos iniciales si esas colecciones están vacías |
 | `npm test` | Corre todos los tests |
 | `npm run test:unit` | Solo los tests unitarios |
 | `npm run test:integration` | Solo el test de integración |
@@ -37,7 +37,7 @@ La API queda en `http://localhost:8080/robiotics` (o el `PORT` del `.env`). `GET
 
 ## Usuario inicial
 
-`npm run seed` crea los usuarios `admin` (contraseña `admin`, perfil admin) y `user` (contraseña `user`, perfil user) si todavía no hay usuarios. Cambiá esas contraseñas después de entrar.
+`npm run seed` crea los usuarios `admin` (contraseña `admin`, perfil admin) y `user` (contraseña `user`, perfil user) si todavía no hay usuarios, y un médico, órganos y medicamentos de ejemplo si esas colecciones están vacías. Cambiá esas contraseñas después de entrar.
 
 Las contraseñas se guardan con bcrypt. Si en la base quedó algún usuario viejo con la contraseña en texto plano, se convierte a hash la primera vez que inicia sesión.
 

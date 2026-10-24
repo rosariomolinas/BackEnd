@@ -5,8 +5,10 @@ import { Usuario } from './usuario/usuario.model';
 import { hashPassword } from './usuario/usuario.service';
 import { Organo } from './organo/organo.model';
 import { Medicamento } from './medicamento/medicamento.model';
+import { Doctor } from './doctor/doctor.model';
 
 // Carga datos iniciales solo en las colecciones vacías: no pisa nada existente.
+// Los usa también el test end-to-end del frontend.
 // Uso: npm run seed
 const seed = async () => {
   await connectDB();
@@ -17,6 +19,11 @@ const seed = async () => {
       { user: 'user', password: await hashPassword('user'), profile: 'user' },
     ]);
     console.log('Usuarios creados: admin/admin (admin) y user/user (user). Cambiá las contraseñas después de entrar.');
+  }
+
+  if (!(await Doctor.countDocuments())) {
+    await Doctor.create({ code: 1, nombre: 'Marta', apellido: 'Ruiz', matricula: 1001, activo: true });
+    console.log('Doctor de ejemplo creado');
   }
 
   if (!(await Organo.countDocuments())) {
