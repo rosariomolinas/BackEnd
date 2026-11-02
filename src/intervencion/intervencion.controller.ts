@@ -1,27 +1,38 @@
 import type { Request, Response } from 'express';
-import { ApiError } from '../shared/errors';
-import { costos } from '../shared/costos';
-import { intervencionService } from './intervencion.service';
+import type { Sesion } from '../shared/auth';
+import { intervencionService as service, type FiltroIntervenciones } from './intervencion.service';
 
 export const intervencionController = {
-  async traertodos(req: Request, res: Response) {
-    const lista = await intervencionService.findAll();
-    res.json({ lista, valores: costos() });
-  },
-
-  async traeralgunos(req: Request, res: Response) {
-    const data = await intervencionService.findByFiltro(req.body);
+  async list(req: Request, res: Response) {
+    const data = await service.findByFiltro(req.query as FiltroIntervenciones);
     res.json({ data, message: data.length ? '' : 'No hay intervenciones para ese filtro' });
   },
 
-  async addnew(req: Request, res: Response) {
-    const doc = await intervencionService.create(req.body);
-    res.status(201).json({ data: [doc], message: 'Datos de la intervención guardados' });
+  async get(req: Request, res: Response) {
+    res.json({ data: await service.findById(req.params.id), message: '' });
   },
 
-  async findCode(req: Request, res: Response) {
-    const doc = await intervencionService.findById(req.body.id);
-    if (!doc) throw new ApiError(404, 'Intervención no encontrada');
-    res.json({ data: [doc], message: '' });
+  async planificacion(req: Request, res: Response) {
+    res.json({ data: await service.datosPlanificacion(), message: '' });
+  },
+
+  async create(req: Request, res: Response) {
+    const data = await service.create(req.body);
+    res.status(201).json({ data, message: 'Intervención planificada' });
+  },
+
+  async update(req: Request, res: Response) {
+    const data = await service.update(req.params.id, req.body);
+    res.json({ data, message: 'Intervención actualizada' });
+  },
+
+  async remove(req: Request, res: Response) {
+    const data = await service.remove(req.params.id);
+    res.json({ data, message: 'Intervención eliminada' });
+  },
+
+  async registrarResultado(req: Request, res: Response) {
+    const data = await service.registrarResultado(req.params.id, req.body, res.locals.sesion as Sesion);
+    res.json({ data, message: `Intervención ${data.estado}` });
   },
 };

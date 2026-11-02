@@ -11,7 +11,7 @@
 
 ## Tema
 ### Descripción
-Robiotics es un sistema para un centro de cirugía robótica. Permite registrar pacientes, doctores, órganos y medicamentos, y planificar intervenciones: para cada intervención se elige paciente, doctor y la ruta de órganos a tratar, indicando qué muestras se toman (tejido, sangre, tomografía 3D) y qué medicación se aplica. El sistema calcula el costo y el tiempo estimado de la intervención.
+Robiotics es un sistema para un centro de cirugía robótica. Permite registrar pacientes, doctores, órganos y medicamentos, y planificar intervenciones: para cada intervención se elige paciente, doctor y la ruta de órganos a tratar, indicando qué muestras se toman (tejido, sangre, tomografía 3D) y qué medicación se aplica. El sistema calcula el costo y el tiempo estimado de la intervención. Después de la fecha planificada se registra el resultado: si se realizó (con el tiempo real que llevó) o si se canceló (con el motivo).
 
 ### Modelo
 
@@ -54,6 +54,7 @@ erDiagram
     MEDICAMENTO {
         number code
         string nombre
+        boolean activo
     }
     INTERVENCION {
         number paciente
@@ -61,6 +62,8 @@ erDiagram
         date fecint
         number costo
         number tiempo
+        string estado "planificada | realizada | cancelada"
+        object resultado "fecha, tiempoReal, observaciones, usuario"
     }
     PASO_RUTA {
         number organo
@@ -87,7 +90,7 @@ Adicionales para Aprobación:
 |Req|Detalle|
 |:-|:-|
 |CRUD|1. CRUD Paciente<br>2. CRUD Doctor<br>3. CRUD Órgano<br>4. CRUD Medicamento<br>5. CRUD Intervención<br>6. CRUD Usuario|
-|CUU/Epic|1. Planificar una intervención<br>2. COMPLETAR: segundo caso de uso que use los datos de la intervención planificada (por ejemplo, registrar el resultado de la intervención)|
+|CUU/Epic|1. Planificar una intervención<br>2. Registrar el resultado de una intervención: sobre una intervención planificada, indicar si se realizó (con el tiempo real) o se canceló (con el motivo). Una vez cerrada ya no se puede modificar|
 
 ### Alcance Adicional Voluntario
 

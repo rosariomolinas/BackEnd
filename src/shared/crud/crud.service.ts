@@ -74,19 +74,19 @@ export class CrudService<T extends EntidadBase> {
 
   async remove(code: number | string) {
     const doc = await this.model.findOneAndUpdate(
-      { code: Number(code) } as FilterQuery<T>,
+      { code: Number(code), ...ACTIVOS } as FilterQuery<T>,
       { activo: false },
       { new: true },
     );
-    if (!doc) throw new ApiError(404, `${this.label} no encontrado`);
+    if (!doc) throw new ApiError(404, `${this.label} no encontrado o ya dado de baja`);
     return doc;
   }
 
   next(code: number | string) {
-    return this.model.find({ code: { $gt: Number(code) }, ...ACTIVOS } as FilterQuery<T>).sort({ code: 1 }).limit(1);
+    return this.model.findOne({ code: { $gt: Number(code) }, ...ACTIVOS } as FilterQuery<T>).sort({ code: 1 });
   }
 
   previous(code: number | string) {
-    return this.model.find({ code: { $lt: Number(code) }, ...ACTIVOS } as FilterQuery<T>).sort({ code: -1 }).limit(1);
+    return this.model.findOne({ code: { $lt: Number(code) }, ...ACTIVOS } as FilterQuery<T>).sort({ code: -1 });
   }
 }
